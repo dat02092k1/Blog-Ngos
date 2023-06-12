@@ -12,7 +12,7 @@ app.use(cors());
 async function startApp() {
     try {
       // Sync models with the database
-      await sequelize.sync();
+      await sequelize.sync({ alter: true });
       console.log('Database sync successful.');
   
       // Start your application or perform other actions

@@ -1,4 +1,5 @@
 const User = require('../model/User');
+var img = require('../service/imageHandle.js');     
 
 const getUsers = async (req, res) => { 
     try {
@@ -10,21 +11,7 @@ const getUsers = async (req, res) => {
         res.status(500).json({ error: 'Error find tasks' });
     }
 }
-
-const addUser = async (req, res) => { 
-    const { username, password, role } = req.body;
-    try {
-        const user = await User.create({
-            username,
-            password,
-            role,
-          });
-      
-          res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Error create user' });
-    }
-}             
+  
 
 const getDetailsUser = async (req, res) => {
     const { id } = req.params;
@@ -51,20 +38,38 @@ const editUser = async (req, res) => {
     const { id } = req.params;
     const { username, role, avatarUrl, publicId } = req.body; 
     try {
+         
         if (!id) {
             return res.status(400).json('cant find user');
         }
-
+        console.log(username);
         const user = await User.findByPk(id);
 
         if (!user) {
             return res.status(404).json('cant find user');
         }
         
-        if (avatarUrl !== user.avatarUrl) {
-            await user.update({
+        if (avatarUrl !== user.avatarUrl && avatarUrl !== undefined) {
+            console.log('flag');
+            img.deleteImageFromCloudinary(user.public_id); 
 
+            await user.update({
+                username, 
+                role, 
+                avatarUrl, 
+                public_id: publicId
             })
+            
+            res.status(200).json(user);
+        }
+        else {
+             await user.update({
+                username, 
+                role, 
+                avatarUrl
+            })
+
+            res.status(200).json(user);
         }
 
     } catch (error) {
@@ -79,18 +84,21 @@ const deleteUser = async (req, res) => {
         const user = await User.findByPk(id);
       
         if (!user) {
-            return res.status(404).json('cant find task');
+            return res.status(404).json('cant find user');
         }
-   
-        await task.destroy();
+        if((user.public_id)) {
+        img.deleteImageFromCloudinary(user.public_id);
+        } 
+        
+        await user.destroy();
 
         res.status(200).json('delete task successfully');
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting task' });
+        res.status(500).json({ error: 'Error deleting user' });
     }
 }
 
 module.exports = {
-    getUsers, addUser, getDetailsUser, editUser
+    getUsers, getDetailsUser, editUser, deleteUser
   };
   
