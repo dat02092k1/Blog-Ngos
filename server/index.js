@@ -1,5 +1,7 @@
 const express = require('express');
 const user = require('./routes/user.js');
+const upload = require('./routes/upload.js');
+
 const cors = require('cors');
 const sequelize = require('./database/database.js');
 
@@ -25,7 +27,8 @@ async function startApp() {
   startApp(); 
 
 app.use('/api/user', user);
- 
+app.use('/api/img', upload);
+
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

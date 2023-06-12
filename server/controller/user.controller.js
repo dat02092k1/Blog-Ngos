@@ -42,15 +42,15 @@ const editUser = async (req, res) => {
         if (!id) {
             return res.status(400).json('cant find user');
         }
-        console.log(username);
+         
         const user = await User.findByPk(id);
-
+        console.log(publicId);
         if (!user) {
             return res.status(404).json('cant find user');
         }
-        
+        console.log(user.avatarUrl);
         if (avatarUrl !== user.avatarUrl && avatarUrl !== undefined) {
-            console.log('flag');
+            console.log(user.public_id);
             img.deleteImageFromCloudinary(user.public_id); 
 
             await user.update({
@@ -86,10 +86,11 @@ const deleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).json('cant find user');
         }
+        
         if((user.public_id)) {
         img.deleteImageFromCloudinary(user.public_id);
         } 
-        
+
         await user.destroy();
 
         res.status(200).json('delete task successfully');

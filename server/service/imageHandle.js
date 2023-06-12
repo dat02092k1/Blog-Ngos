@@ -1,15 +1,23 @@
 const { cloudinary } = require("../upload/cloudinary.js");
 
-async function uploadImageToCloudinary(imagePath) {
+async function uploadImageToCloudinary(req, res) {
     try {
-      const result = await cloudinary.uploader.upload(imagePath, {
-        folder: 'File_img_CVHT_UET'
+      const file = req.file;
+      console.log(file);
+      if (!file.mimetype.startsWith('image/')) {
+        return res.status(400).send({ message: 'Only image files are allowed' });
+      }
+
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'Avatar user'   
       });
-      console.log('Image uploaded to Cloudinary:', result);
-      return result.secure_url;
-    } catch (error) {
+
+      console.log('Image uploaded to Cloudinary:', result);     
+      res.status(200).send({ avatarUrl: result.secure_url, public_id: result.public_id }); 
+     } 
+     catch (error) {
       console.error('Error uploading image to Cloudinary:', error);
-      return null;
+      res.status(500).send({ message: 'Error uploading image' }); 
     }
   }
   
